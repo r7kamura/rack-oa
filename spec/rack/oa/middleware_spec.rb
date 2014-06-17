@@ -16,10 +16,33 @@ describe Rack::Oa::Middleware do
     end
   end
 
-  describe "#call" do
-    it "bahaves like a Rack middleware" do
-      get "/"
-      last_response.status.should == 200
+  # Alias
+  let(:response) do
+    last_response
+  end
+
+  subject do
+    send(method, path, params, env)
+    response.status
+  end
+
+  let(:params) do
+    {}
+  end
+
+  let(:env) do
+    {}
+  end
+
+  describe "POST /token" do
+    let(:method) do
+      :post
     end
+
+    let(:path) do
+      "/token"
+    end
+
+    it { should == 200 }
   end
 end
