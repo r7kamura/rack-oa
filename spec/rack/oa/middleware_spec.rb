@@ -34,15 +34,17 @@ describe Rack::Oa::Middleware do
     {}
   end
 
-  describe "POST /token" do
+  describe "GET /oauth/token" do
     let(:method) do
-      :post
+      :get
     end
 
     let(:path) do
-      "/token"
+      "/oauth/token"
     end
 
-    it { should == 200 }
+    context "without access token" do
+      it { should == 401 }
+    end
   end
 end

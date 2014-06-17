@@ -1,3 +1,5 @@
 require "rack"
+require "rack/multiplexer"
+require "rack/oa/actions/access_token_validation"
 require "rack/oa/middleware"
 require "rack/oa/version"
