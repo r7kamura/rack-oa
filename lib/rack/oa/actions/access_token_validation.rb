@@ -12,19 +12,24 @@ module Rack
           @env = env
         end
 
-        # TODO
         # Validates access token, given from Authorization header or access_token parameter
         # @param env [Hash] Rack env
         # @return [Array] Rack response
         def call
-          if access_token
-            [200, {}, [""]]
-          else
-            [401, {}, [""]]
-          end
+          response.to_rack_response
         end
 
         private
+
+        # @return [Rack::Oa::Responses::Base]
+        def response
+          case
+          when access_token
+            Responses::ValidAccessToken.new
+          else
+            Responses::InvalidRequest.new
+          end
+        end
 
         # @return [String, nil] Access token given from user-agent
         def access_token

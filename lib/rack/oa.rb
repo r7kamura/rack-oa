@@ -1,5 +1,10 @@
+require "json"
 require "rack"
 require "rack/multiplexer"
+
 require "rack/oa/actions/access_token_validation"
 require "rack/oa/middleware"
+require "rack/oa/responses/base"
+require "rack/oa/responses/invalid_request"
+require "rack/oa/responses/valid_access_token"
 require "rack/oa/version"
