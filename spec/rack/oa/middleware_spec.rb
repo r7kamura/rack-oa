@@ -1,4 +1,5 @@
 require "spec_helper"
+require "securerandom"
 
 describe Rack::Oa::Middleware do
   include Rack::Test::Methods
@@ -30,8 +31,18 @@ describe Rack::Oa::Middleware do
     {}
   end
 
-  let(:env) do
+  let(:headers) do
     {}
+  end
+
+  let(:env) do
+    headers.inject({}) do |result, (key, value)|
+      result.merge("HTTP_" + key.upcase.gsub("-", "_") => value)
+    end
+  end
+
+  let(:access_token) do
+    SecureRandom.hex(32)
   end
 
   describe "GET /oauth/token" do
@@ -45,6 +56,20 @@ describe Rack::Oa::Middleware do
 
     context "without access token" do
       it { should == 401 }
+    end
+
+    context "with Authorization header with bearer access token" do
+      before do
+        headers["Authorization"] = "Bearer #{access_token}"
+      end
+      it { should == 200 }
+    end
+
+    context "with access token parameter" do
+      before do
+        params[:access_token] = access_token
+      end
+      it { should == 200 }
     end
   end
 end

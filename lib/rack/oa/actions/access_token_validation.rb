@@ -12,11 +12,16 @@ module Rack
           @env = env
         end
 
+        # TODO
         # Validates access token, given from Authorization header or access_token parameter
         # @param env [Hash] Rack env
         # @return [Array] Rack response
         def call
-          [401, {}, [""]]
+          if access_token
+            [200, {}, [""]]
+          else
+            [401, {}, [""]]
+          end
         end
 
         private
@@ -26,15 +31,31 @@ module Rack
           access_token_from_header || access_token_from_parameter
         end
 
-        # @return [String, nil] Access token extracted from Authorization header
+        # @return [String, nil]
         def access_token_from_header
+          authorization_header && bearer_access_token
         end
 
-        def request_header
+        # @return [String, nil]
+        def access_token_from_parameter
+          request.params["access_token"]
         end
 
+        # @return [Rack::Request]
         def request
           @request ||= Rack::Request.new(@env)
+        end
+
+        private
+
+        # @return [String, nil]
+        def authorization_header
+          @authorization_header ||= @env["HTTP_AUTHORIZATION"]
+        end
+
+        # @return [String, nil]
+        def bearer_access_token
+          @bearer_access_token ||= authorization_header.to_s[/\ABearer (.+)/, 1]
         end
       end
     end
