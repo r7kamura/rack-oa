@@ -55,21 +55,35 @@ describe Rack::Oa::Middleware do
     end
 
     context "without access token" do
-      it { should == 401 }
+      it "returns an invalid_request error" do
+        should == 401
+        response.body.should be_json_as(
+          error: "invalid_request",
+          error_message: "Access token was not given",
+        )
+      end
     end
 
     context "with Authorization header with bearer access token" do
       before do
         headers["Authorization"] = "Bearer #{access_token}"
       end
-      it { should == 200 }
+
+      it "returns access token details" do
+        should == 200
+        response.body.should be_json
+      end
     end
 
     context "with access token parameter" do
       before do
         params[:access_token] = access_token
       end
-      it { should == 200 }
+
+      it "returns access token details" do
+        should == 200
+        response.body.should be_json
+      end
     end
   end
 end
