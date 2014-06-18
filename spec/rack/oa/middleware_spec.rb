@@ -6,7 +6,7 @@ describe Rack::Oa::Middleware do
 
   let(:app) do
     app = Rack::Builder.new
-    app.use Rack::Oa::Middleware, authorization_class: authorization_class
+    app.use Rack::Oa::Middleware, options
     app.run ->(env) do
       [
         200,
@@ -15,6 +15,14 @@ describe Rack::Oa::Middleware do
       ]
     end
     app
+  end
+
+  let(:options) do
+    {
+      authorization_class: authorization_class,
+      client_class: client_class,
+      resource_owner_class: resource_owner_class,
+    }
   end
 
   let(:authorization_class) do
@@ -36,6 +44,22 @@ describe Rack::Oa::Middleware do
           token: nil,
           updated_at: nil,
         }
+      end
+    end
+  end
+
+  let(:client_class) do
+    Class.new do
+      def self.find_by(client_id: nil, client_secret: nil)
+        new
+      end
+    end
+  end
+
+  let(:resource_owner_class) do
+    Class.new do
+      def self.find_by(username: nil, password: nil)
+        new
       end
     end
   end

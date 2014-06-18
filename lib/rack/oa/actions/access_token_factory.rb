@@ -83,29 +83,11 @@ module Rack
         end
 
         def client
-          @client ||= client_class.find_by(client_id: client_id, client_secret: client_secret)
+          @client ||= @client_class.find_by(client_id: client_id, client_secret: client_secret)
         end
 
         def resource_owner
-          @resource_owner ||= resource_owner_class.find_by(username: client_id, password: client_secret)
-        end
-
-        # TODO
-        def client_class
-          Class.new do
-            def self.find_by(*args)
-              new
-            end
-          end
-        end
-
-        # TODO
-        def resource_owner_class
-          Class.new do
-            def self.find_by(*args)
-              new
-            end
-          end
+          @resource_owner ||= @resource_owner_class.find_by(username: client_id, password: client_secret)
         end
 
         # TODO
