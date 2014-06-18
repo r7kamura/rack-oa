@@ -5,11 +5,15 @@ Rack middleware for OAuth 2.0
 This library provides `Rack::Oa::Middleware` to help developers implement OAuth 2.0 Provider.
 
 ### Required classes
-Rack::Oa::Middleware provides `GET /oauth/token` as a token validator API,
-and `POST /oauth/token` as a token creation API.
-To have these APIs work well, you need to pass some model class objects
-that respond to `.find_by` and `#to_hash` methods.
+* authorization class
+ * .create
+ * .find_by
+* client class
+ * .find_by
+* resource owner class
+ * .find_by
 
+### Example
 ```ruby
 class Authorization
   # @param access_token [String] Access token string (e.g. "0b1a56c2452de3167a45")
