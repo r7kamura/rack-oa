@@ -71,7 +71,14 @@ describe Rack::Oa::Middleware do
 
       it "returns access token details" do
         should == 200
-        response.body.should be_json
+        response.body.should be_json(
+          application: nil,
+          created_at: nil,
+          note: nil,
+          scopes: nil,
+          token: nil,
+          updated_at: nil,
+        )
       end
     end
 
@@ -80,9 +87,8 @@ describe Rack::Oa::Middleware do
         params[:access_token] = access_token
       end
 
-      it "returns access token details" do
+      it "always takes access token via parameter" do
         should == 200
-        response.body.should be_json
       end
     end
   end

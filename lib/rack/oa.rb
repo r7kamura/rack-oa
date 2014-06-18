@@ -3,6 +3,7 @@ require "rack"
 require "rack/multiplexer"
 
 require "rack/oa/actions/access_token_validation"
+require "rack/oa/authorization"
 require "rack/oa/middleware"
 require "rack/oa/responses/base"
 require "rack/oa/responses/invalid_request"

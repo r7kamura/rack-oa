@@ -24,16 +24,23 @@ module Rack
         # @return [Rack::Oa::Responses::Base]
         def response
           case
-          when access_token
-            Responses::ValidAccessToken.new
+          when authorization
+            Responses::ValidAccessToken.new(authorization: authorization)
           else
             Responses::InvalidRequest.new
           end
         end
 
+        # @return [Rack::Oa::Authorization, nil]
+        def authorization
+          if access_token
+            authorization_class.find_by(access_token: access_token)
+          end
+        end
+
         # @return [String, nil] Access token given from user-agent
         def access_token
-          access_token_from_header || access_token_from_parameter
+          @access_token ||= access_token_from_header || access_token_from_parameter
         end
 
         # @return [String, nil]
@@ -61,6 +68,12 @@ module Rack
         # @return [String, nil]
         def bearer_access_token
           @bearer_access_token ||= authorization_header.to_s[/\ABearer (.+)/, 1]
+        end
+
+        # TODO: Allow to inject this class
+        # @return [Object] An object that behaves like Authorization record class
+        def authorization_class
+          Authorization
         end
       end
     end
