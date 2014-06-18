@@ -2,14 +2,11 @@ module Rack
   module Oa
     module Actions
       class AccessTokenValidation
-        # Wrapper of #call
-        def self.call(env)
-          new(env).call
-        end
-
         # @param env [Hash] Rack env
-        def initialize(env)
+        # @param authorization_class [Class] A class that provides storage logic for authorization
+        def initialize(env: nil, authorization_class: nil)
           @env = env
+          @authorization_class = authorization_class
         end
 
         # Validates access token, given from Authorization header or access_token parameter
@@ -34,7 +31,7 @@ module Rack
         # @return [Rack::Oa::Authorization, nil]
         def authorization
           if access_token
-            authorization_class.find_by(access_token: access_token)
+            @authorization_class.find_by(access_token: access_token)
           end
         end
 
@@ -68,12 +65,6 @@ module Rack
         # @return [String, nil]
         def bearer_access_token
           @bearer_access_token ||= authorization_header.to_s[/\ABearer (.+)/, 1]
-        end
-
-        # TODO: Allow to inject this class
-        # @return [Object] An object that behaves like Authorization record class
-        def authorization_class
-          Authorization
         end
       end
     end

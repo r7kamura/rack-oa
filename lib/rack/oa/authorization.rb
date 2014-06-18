@@ -5,6 +5,17 @@ module Rack
         new
       end
 
+      def to_hash
+        {
+          application: application,
+          created_at: created_at,
+          note: note,
+          scopes: scopes,
+          token: token,
+          updated_at: updated_at,
+        }
+      end
+
       def application
       end
 
