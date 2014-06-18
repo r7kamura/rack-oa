@@ -2,6 +2,12 @@ module Rack
   module Oa
     module Actions
       class AccessTokenFactory < Base
+        def initialize(client_class: nil, resource_owner_class: nil, **args)
+          super(**args)
+          @client_class = client_class
+          @resource_owner_class = resource_owner_class
+        end
+
         private
 
         def response
@@ -12,8 +18,10 @@ module Rack
             Responses::InvalidRequest.new
           when !has_client_or_resource_owner?
             Responses::InvalidClient.new
+          when has_client?
+            Responses::NewAccessToken.new(authorization_class: @authorization_class, client: client)
           else
-            Responses::NewAccessToken.new
+            Responses::NewAccessToken.new(authorization_class: @authorization_class, resource_owner: resource_owner)
           end
         end
 

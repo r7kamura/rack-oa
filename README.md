@@ -4,15 +4,13 @@ Rack middleware for OAuth 2.0
 ## Usage
 This library provides `Rack::Oa::Middleware` to help developers implement OAuth 2.0 Provider.
 
-### GET /oauth/token
-Rack::Oa::Middleware provides `GET /oauth/token` as a token validator API.
-To have this work well, you need to pass authorization class object
-that responds to `.find_by` method via :authorization_class option.
-This class method must return an object that responds to `.to_hash` method,
-which will be used as a response body to be returned to user-agent.
+### Required classes
+Rack::Oa::Middleware provides `GET /oauth/token` as a token validator API,
+and `POST /oauth/token` as a token creation API.
+To have these APIs work well, you need to pass some model class objects
+that respond to `.find_by` and `#to_hash` methods.
 
 ```ruby
-# Suppose that you have OauthAccessToken ActiveRecord class to persist access tokens.
 class Authorization
   # @param access_token [String] Access token string (e.g. "0b1a56c2452de3167a45")
   # @return [Object, nil] An object that responds to .to_hash method, or nil
@@ -39,5 +37,34 @@ class Authorization
   end
 end
 
-use Rack::Oa::Middleware, authorization_class: Authorization
+class Client
+  def self.find_by(client_id: nil, client_secret: nil)
+    if client = OauthClient.find_by(client_id: client_id, client_secret: client_secret)
+      new(client)
+    end
+  end
+
+  def initialize(client)
+    @client = client
+  end
+end
+
+class ResourceOwner
+  def self.find_by(username: nil, password: nil)
+    if user = User.find_by(username: username, password: password)
+      new(user)
+    end
+  end
+
+  def initialize(user)
+    @user = user
+  end
+end
+
+use(
+  Rack::Oa::Middleware,
+  authorization_class: Authorization,
+  client_class: Client,
+  resource_owner_class: ResourceOwner,
+)
 ```

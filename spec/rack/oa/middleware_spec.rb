@@ -5,14 +5,37 @@ describe Rack::Oa::Middleware do
   include Rack::Test::Methods
 
   let(:app) do
-    Rack::Builder.app do
-      use Rack::Oa::Middleware
-      run ->(env) do
-        [
-          200,
-          {},
-          ["dummy"],
-        ]
+    app = Rack::Builder.new
+    app.use Rack::Oa::Middleware, authorization_class: authorization_class
+    app.run ->(env) do
+      [
+        200,
+        {},
+        ["dummy"],
+      ]
+    end
+    app
+  end
+
+  let(:authorization_class) do
+    Class.new do
+      def self.find_by(access_token: nil)
+        new
+      end
+
+      def self.create(client: nil, resource_owner: nil)
+        new
+      end
+
+      def to_hash
+        {
+          application: nil,
+          created_at: nil,
+          note: nil,
+          scopes: nil,
+          token: nil,
+          updated_at: nil,
+        }
       end
     end
   end
@@ -83,7 +106,7 @@ describe Rack::Oa::Middleware do
 
       it "returns access token details" do
         should == 200
-        response.body.should be_json(
+        response.body.should be_json_as(
           application: nil,
           created_at: nil,
           note: nil,
@@ -138,7 +161,14 @@ describe Rack::Oa::Middleware do
     context "with valid condition" do
       it "creates a authorization" do
         should == 201
-        response.body.should be_json
+        response.body.should be_json_as(
+          application: nil,
+          created_at: nil,
+          note: nil,
+          scopes: nil,
+          token: nil,
+          updated_at: nil,
+        )
       end
     end
   end
