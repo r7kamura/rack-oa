@@ -18,10 +18,13 @@ module Rack
             Responses::InvalidRequest.new
           when !has_client_or_resource_owner?
             Responses::InvalidClient.new
-          when has_client?
-            Responses::NewAccessToken.new(authorization_class: @authorization_class, client: client)
           else
-            Responses::NewAccessToken.new(authorization_class: @authorization_class, resource_owner: resource_owner)
+            Responses::NewAccessToken.new(
+              authorization_class: @authorization_class,
+              client: client,
+              resource_owner: resource_owner,
+              scopes: requested_scopes,
+            )
           end
         end
 

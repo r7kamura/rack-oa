@@ -24,6 +24,16 @@ class Authorization
     end
   end
 
+  def self.create(client: nil, resource_owner: nil, scopes: nil)
+    new(
+      OauthAccessToken.create(
+        client_id: client.try(:id),
+        resource_owner_id: resource_owner.try(:id),
+        scopes: scopes,
+      )
+    )
+  end
+
   def initialize(oauth_access_token)
     @oauth_access_token = oauth_access_token
   end

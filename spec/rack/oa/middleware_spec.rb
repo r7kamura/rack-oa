@@ -23,7 +23,7 @@ describe Rack::Oa::Middleware do
         new
       end
 
-      def self.create(client: nil, resource_owner: nil)
+      def self.create(client: nil, resource_owner: nil, scopes: nil)
         new
       end
 
