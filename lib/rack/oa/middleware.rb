@@ -22,6 +22,10 @@ module Rack
           router.get "/oauth/token" do |env|
             Actions::AccessTokenValidation.new(env: env, authorization_class: @authorization_class).call
           end
+
+          router.post "/oauth/token" do |env|
+            Actions::AccessTokenFactory.new(env: env, authorization_class: @authorization_class).call
+          end
         end
       end
     end

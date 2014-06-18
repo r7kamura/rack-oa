@@ -45,6 +45,16 @@ describe Rack::Oa::Middleware do
     SecureRandom.hex(32)
   end
 
+  shared_examples_for "invalid request error" do
+    it "returns an invalid request error" do
+      should == 401
+      response.body.should be_json_as(
+        error: "invalid_request",
+        error_message: "Access token was not given",
+      )
+    end
+  end
+
   describe "GET /oauth/token" do
     let(:method) do
       :get
@@ -55,13 +65,7 @@ describe Rack::Oa::Middleware do
     end
 
     context "without access token" do
-      it "returns an invalid_request error" do
-        should == 401
-        response.body.should be_json_as(
-          error: "invalid_request",
-          error_message: "Access token was not given",
-        )
-      end
+      include_examples "invalid request error"
     end
 
     context "with Authorization header with bearer access token" do
@@ -89,6 +93,42 @@ describe Rack::Oa::Middleware do
 
       it "always takes access token via parameter" do
         should == 200
+      end
+    end
+  end
+
+  describe "POST /oauth/token" do
+    before do
+      params[:client_id] = SecureRandom.hex(32)
+      params[:client_secret] = SecureRandom.hex(32)
+    end
+
+    let(:method) do
+      :post
+    end
+
+    let(:path) do
+      "/oauth/token"
+    end
+
+    context "without client_id parameter" do
+      before do
+        params.delete(:client_id)
+      end
+      include_examples "invalid request error"
+    end
+
+    context "without client_secret parameter" do
+      before do
+        params.delete(:client_secret)
+      end
+      include_examples "invalid request error"
+    end
+
+    context "with valid condition" do
+      it "creates a authorization" do
+        should == 201
+        response.body.should be_json
       end
     end
   end

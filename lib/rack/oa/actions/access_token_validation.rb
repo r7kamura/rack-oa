@@ -1,21 +1,7 @@
 module Rack
   module Oa
     module Actions
-      class AccessTokenValidation
-        # @param env [Hash] Rack env
-        # @param authorization_class [Class] A class that provides storage logic for authorization
-        def initialize(env: nil, authorization_class: nil)
-          @env = env
-          @authorization_class = authorization_class
-        end
-
-        # Validates access token, given from Authorization header or access_token parameter
-        # @param env [Hash] Rack env
-        # @return [Array] Rack response
-        def call
-          response.to_rack_response
-        end
-
+      class AccessTokenValidation < Base
         private
 
         # @return [Rack::Oa::Responses::Base]
@@ -48,11 +34,6 @@ module Rack
         # @return [String, nil]
         def access_token_from_parameter
           request.params["access_token"]
-        end
-
-        # @return [Rack::Request]
-        def request
-          @request ||= Rack::Request.new(@env)
         end
 
         private
