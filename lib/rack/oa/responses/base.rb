@@ -12,7 +12,7 @@ module Rack
 
         # @return [String]
         def body
-          JSON.pretty_generate(params)
+          JSON.pretty_generate(params) + "\n"
         end
 
         # @return [Hash]
