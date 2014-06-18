@@ -23,7 +23,7 @@ describe Rack::Oa::Middleware do
   end
 
   subject do
-    send(method, path, params, env)
+    send(method, path, request_body, env)
     response.status
   end
 
@@ -35,9 +35,17 @@ describe Rack::Oa::Middleware do
     {}
   end
 
+  let(:request_body) do
+    %r<application/json> === headers["Content-Type"] ? params.to_json : params
+  end
+
   let(:env) do
     headers.inject({}) do |result, (key, value)|
-      result.merge("HTTP_" + key.upcase.gsub("-", "_") => value)
+      if key == "Content-Type"
+        result.merge(key.upcase.gsub("-", "_") => value)
+      else
+        result.merge("HTTP_" + key.upcase.gsub("-", "_") => value)
+      end
     end
   end
 
@@ -99,8 +107,10 @@ describe Rack::Oa::Middleware do
 
   describe "POST /oauth/token" do
     before do
+      headers["Content-Type"] = "application/json"
       params[:client_id] = SecureRandom.hex(32)
       params[:client_secret] = SecureRandom.hex(32)
+      params[:scopes] = []
     end
 
     let(:method) do
